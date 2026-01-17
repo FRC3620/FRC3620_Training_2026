@@ -6,10 +6,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.usfirst.frc3620.logger.EventLogging;
+import org.tinylog.TaggedLogger;
 import org.usfirst.frc3620.logger.LogCommand;
-import org.usfirst.frc3620.logger.EventLogging.Level;
+import org.usfirst.frc3620.logger.LoggingMaster;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -20,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  public final static Logger logger = EventLogging.getLogger(RobotContainer.class, Level.INFO);
+  public final static TaggedLogger logger = LoggingMaster.getLogger(RobotContainer.class);
   
   // hardware here...
 

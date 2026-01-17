@@ -1,18 +1,18 @@
 package org.usfirst.frc3620.logger;
 
-import org.slf4j.Logger;
-import org.usfirst.frc3620.logger.EventLogging.Level;
+import org.tinylog.TaggedLogger;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
+@SuppressWarnings("unused")
 public class LogCommand extends InstantCommand {
-  static Logger defaultLogger = EventLogging.getLogger(LogCommand.class, Level.INFO);
+  static TaggedLogger defaultLogger = LoggingMaster.getLogger(LogCommand.class);
 
-  private Logger logger;
+  private final TaggedLogger logger;
 
-  private String msg;
+  private final String msg;
 
-  private Object[] args;
+  private final Object[] args;
 
   public LogCommand(String message) {
     this(null, message, null);
@@ -22,11 +22,11 @@ public class LogCommand extends InstantCommand {
     this(null, message, args);
   }
 
-  public LogCommand(Logger constructorLogger, String message) {
+  public LogCommand(TaggedLogger constructorLogger, String message) {
     this(constructorLogger, message, null);
   }
 
-  public LogCommand(Logger constructorLogger, String message, Object[] args) {
+  public LogCommand(TaggedLogger constructorLogger, String message, Object[] args) {
     logger = (constructorLogger == null) ? defaultLogger : constructorLogger;
     msg = message;
     this.args = args;

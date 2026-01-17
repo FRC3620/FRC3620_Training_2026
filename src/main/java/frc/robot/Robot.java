@@ -2,12 +2,18 @@ package frc.robot;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.usfirst.frc3620.logger.EventLogging;
-import org.usfirst.frc3620.logger.EventLogging.Level;
-import org.usfirst.frc3620.misc.GitNess;
-import org.usfirst.frc3620.misc.RobotMode;
+import org.usfirst.frc3620.logger.LoggingMaster;
 
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
+
+import org.tinylog.TaggedLogger;
+import org.usfirst.frc3620.GitNess;
+import org.usfirst.frc3620.RobotMode;
+import org.usfirst.frc3620.Utilities;
+
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,7 +29,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private Logger logger;
+  private TaggedLogger logger;
 
   static private RobotMode currentRobotMode = RobotMode.INIT, previousRobotMode;
 
@@ -35,13 +41,33 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    logger = EventLogging.getLogger(Robot.class, Level.INFO);
-    logger.info ("I'm alive! {}", GitNess.gitDescription());
+    // get data logging going
+    DogLog.setOptions(new DogLogOptions().withCaptureDs(false).withCaptureNt(false));
+    DataLogManager.start();
 
+    logger = LoggingMaster.getLogger(getClass());
+    logger.info ("I'm alive! {}", GitNess.gitDescription());
+    Utilities.logMetadataToDataLog();
+
+    // whenever a command initializes, the function declared below will run.
+    CommandScheduler.getInstance().onCommandInitialize(command ->
+            logger.info("Initialized {}", command.getClass().getSimpleName()));
+
+    // whenever a command ends, the function declared below will run.
+    CommandScheduler.getInstance().onCommandFinish(command ->
+            logger.info("Ended {}", command.getClass().getSimpleName()));
+
+    // whenever a command ends, the function declared below will run.
+    CommandScheduler.getInstance().onCommandInterrupt(command ->
+            logger.info("Interrupted {}", command.getClass().getSimpleName()));
+    
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
+    enableLiveWindowInTest(true);
+
+    DriverStation.silenceJoystickConnectionWarning(true);
   }
 
   /**
@@ -79,7 +105,7 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+      CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
   }
 

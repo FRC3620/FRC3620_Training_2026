@@ -90,6 +90,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     processRobotModeChange(RobotMode.DISABLED);
+    logger.info ("chicken nuggies with sauce");
   }
 
   @Override
@@ -107,11 +108,13 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+    logger.info ("Hola");
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    logger.info ("I love");
   }
 
   @Override
@@ -125,6 +128,7 @@ public class Robot extends TimedRobot {
     }
 
     processRobotModeChange(RobotMode.TELEOP);
+    logger.info ("Hello!");
   }
 
   /** This function is called periodically during operator control. */

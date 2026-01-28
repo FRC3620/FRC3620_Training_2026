@@ -12,6 +12,8 @@ import org.usfirst.frc3620.GitNess;
 import org.usfirst.frc3620.RobotMode;
 import org.usfirst.frc3620.Utilities;
 
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -34,6 +36,7 @@ public class Robot extends TimedRobot {
   static private RobotMode currentRobotMode = RobotMode.INIT, previousRobotMode;
 
   Date dateAtInitialization = new Date();
+  DoubleEntry aEntry, bEntry, xEntry;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -68,7 +71,12 @@ public class Robot extends TimedRobot {
     enableLiveWindowInTest(true);
 
     DriverStation.silenceJoystickConnectionWarning(true);
-  }
+    aEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/a").getEntry(0.0);
+    bEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/b").getEntry(0.0);
+    xEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/x").getEntry(0.0);
+    aEntry.set(0.0);
+    bEntry.set(0.0);
+}
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -84,7 +92,11 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-  }
+  double a = aEntry.get();
+    double b = bEntry.get();
+    double x = a / b;
+    xEntry.set(x);
+}
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override

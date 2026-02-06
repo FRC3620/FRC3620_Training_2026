@@ -6,12 +6,15 @@ import org.usfirst.frc3620.logger.LoggingMaster;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import dev.doglog.internal.log_thread.writers.NetworkTablesWriter;
 
 import org.tinylog.TaggedLogger;
 import org.usfirst.frc3620.GitNess;
 import org.usfirst.frc3620.RobotMode;
 import org.usfirst.frc3620.Utilities;
 
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -19,9 +22,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the
+ * name of this class or
+ * the package after creating this project, you must also update the
+ * build.gradle file in the
  * project.
  */
 public class Robot extends TimedRobot {
@@ -35,8 +41,11 @@ public class Robot extends TimedRobot {
 
   Date dateAtInitialization = new Date();
 
+  DoubleEntry aEntry, bEntry, cEntry, xEntry;
+
   /**
-   * This function is run when the robot is first started up and should be used for any
+   * This function is run when the robot is first started up and should be used
+   * for any
    * initialization code.
    */
   @Override
@@ -46,44 +55,64 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
 
     logger = LoggingMaster.getLogger(getClass());
-    logger.info ("I'm alive! {}", GitNess.gitDescription());
+    logger.info("I'm alive! {}", GitNess.gitDescription());
     Utilities.logMetadataToDataLog();
 
     // whenever a command initializes, the function declared below will run.
-    CommandScheduler.getInstance().onCommandInitialize(command ->
-            logger.info("Initialized {}", command.getClass().getSimpleName()));
+    CommandScheduler.getInstance()
+        .onCommandInitialize(command -> logger.info("Initialized {}", command.getClass().getSimpleName()));
 
     // whenever a command ends, the function declared below will run.
-    CommandScheduler.getInstance().onCommandFinish(command ->
-            logger.info("Ended {}", command.getClass().getSimpleName()));
+    CommandScheduler.getInstance()
+        .onCommandFinish(command -> logger.info("Ended {}", command.getClass().getSimpleName()));
 
     // whenever a command ends, the function declared below will run.
-    CommandScheduler.getInstance().onCommandInterrupt(command ->
-            logger.info("Interrupted {}", command.getClass().getSimpleName()));
-    
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+    CommandScheduler.getInstance()
+        .onCommandInterrupt(command -> logger.info("Interrupted {}", command.getClass().getSimpleName()));
+
+    // Instantiate our RobotContainer. This will perform all our button bindings,
+    // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
     enableLiveWindowInTest(true);
 
     DriverStation.silenceJoystickConnectionWarning(true);
+    aEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/a").getEntry(0.0);
+    bEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/b").getEntry(0.0);
+    cEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/c").getEntry(0.0);
+    xEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/x").getEntry(0.0);
+    aEntry.set(0.0);
+    bEntry.set(0.0);
+    cEntry.set(0.0);
   }
 
   /**
-   * This function is called every robot packet, no matter the mode. Use this for items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
+   * This function is called every robot packet, no matter the mode. Use this for
+   * items like
+   * diagnostics that you want ran during disabled, autonomous, teleoperated and
+   * test.
    *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and
    * SmartDashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled
+    // commands, running already-scheduled commands, removing finished or
+    // interrupted commands,
+    // and running subsystem periodic() methods. This must be called from the
+    // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    double a = aEntry.get();
+    double b = bEntry.get();
+    double c = cEntry.get();
+    double x = (a * a) + c - b + (c + a) + (b / a - c);
+    xEntry.set(x);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -96,7 +125,10 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
   }
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /**
+   * This autonomous runs the autonomous command selected by your
+   * {@link RobotContainer} class.
+   */
   @Override
   public void autonomousInit() {
     processRobotModeChange(RobotMode.AUTONOMOUS);
@@ -129,7 +161,8 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
   public void testInit() {
@@ -143,8 +176,8 @@ public class Robot extends TimedRobot {
   }
 
   /*
-  * this routine gets called whenever we change modes
-  */
+   * this routine gets called whenever we change modes
+   */
   void processRobotModeChange(RobotMode newMode) {
     previousRobotMode = currentRobotMode;
     currentRobotMode = newMode;
@@ -154,11 +187,11 @@ public class Robot extends TimedRobot {
     // exampleSubsystem.processRobotModeChange(newMode);
   }
 
-  public static RobotMode getCurrentRobotMode(){
+  public static RobotMode getCurrentRobotMode() {
     return currentRobotMode;
   }
 
-  public static RobotMode getPreviousRobotMode(){
+  public static RobotMode getPreviousRobotMode() {
     return previousRobotMode;
   }
 }

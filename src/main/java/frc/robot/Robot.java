@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
   static private RobotMode currentRobotMode = RobotMode.INIT, previousRobotMode;
 
   Date dateAtInitialization = new Date();
-  DoubleEntry aEntry, bEntry, xEntry;
+  DoubleEntry aEntry, bEntry, xEntry, cEntry, dEntry;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -73,9 +73,13 @@ public class Robot extends TimedRobot {
     DriverStation.silenceJoystickConnectionWarning(true);
     aEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/a").getEntry(0.0);
     bEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/b").getEntry(0.0);
+    cEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/c").getEntry(0.0);
+    dEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/d").getEntry(0.0);
     xEntry = NetworkTableInstance.getDefault().getDoubleTopic("/SmartDashboard/x").getEntry(0.0);
     aEntry.set(0.0);
     bEntry.set(0.0);
+    cEntry.set(0,0);
+    dEntry.set(0,0);
 }
 
   /**
@@ -94,7 +98,9 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   double a = aEntry.get();
     double b = bEntry.get();
-    double x = a / b;
+    double c = cEntry.get();
+    double d = dEntry.get();
+    double x = a * (b + c) * d;
     xEntry.set(x);
 }
 

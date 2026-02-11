@@ -4,26 +4,50 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** Add your docs here. */
-public class RunPropellorCommand extends Command{
+public class RunPropellorCommand extends Command {
+    double savedPower;
+    Timer timer;
 
-public RunPropellorCommand()
-{
-    addRequirements(RobotContainer.propellorSubsystem);
-}
+    public RunPropellorCommand(double power) {
+        savedPower = power;
 
-@Override
-public void initialize() {}
+        timer = new Timer();
 
-@Override
-public void execute() {
-    RobotContainer.propellorSubsystem.spinPropellor(0.5);
-}
+        addRequirements(RobotContainer.propellorSubsystem);
+    }
 
-@Override
-public void end(boolean interrupted) {
-    RobotContainer.propellorSubsystem.spinPropellor(0);
-}
+    @Override
+    public void initialize() {
+        timer.reset();
+        timer.start();
+    }
+
+    @Override
+    public void execute() {
+        double power = savedPower;
+        if (timer.hasElapsed(2.0)) {
+            power = savedPower / 3;
+        } else if (timer.hasElapsed(1.0)) {
+            power = savedPower / 2;
+        } else {
+            power = savedPower;
+        }
+        RobotContainer.propellorSubsystem.spinPropellor(power);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        timer.stop();
+        RobotContainer.propellorSubsystem.spinPropellor(0);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return timer.hasElapsed(5.0);
+    }
+
 }

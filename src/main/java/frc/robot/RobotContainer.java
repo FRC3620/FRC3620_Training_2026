@@ -13,22 +13,27 @@ import org.usfirst.frc3620.logger.LoggingMaster;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   public final static TaggedLogger logger = LoggingMaster.getLogger(RobotContainer.class);
-  
+
   // hardware here...
 
   // subsystems here
-public static PropellorSubsystem propellorSubsystem;
+  public static PropellorSubsystem propellorSubsystem;
   // joysticks here....
   public static Joystick driverJoystick;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     makeSubsystems();
 
@@ -41,13 +46,15 @@ public static PropellorSubsystem propellorSubsystem;
   }
 
   private void makeSubsystems() {
-    propellorSubsystem = new PropellorSubsystem() ;
+    propellorSubsystem = new PropellorSubsystem();
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
@@ -55,16 +62,20 @@ public static PropellorSubsystem propellorSubsystem;
   }
 
   private void setupSmartDashboardCommands() {
-    SmartDashboard.putData (new RunPropellorCommand () ) ;
+    SmartDashboard.putData(new RunPropellorCommand(0.4));
+    SmartDashboard.putData(new ForwardAndBackCommand());
+    SmartDashboard.putData(new RunPropellorFromJoystickCommand());
   }
 
   SendableChooser<CommandFactory> chooser = new SendableChooser<>();
+
   public void setupAutonomousCommands() {
     SmartDashboard.putData("Auto mode", chooser);
     chooser.setDefaultOption("Do nothing", () -> new LogCommand("no autonomous specified, did nothing"));
   }
 
-  interface CommandFactory extends Supplier<Command> { }
+  interface CommandFactory extends Supplier<Command> {
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -74,7 +85,12 @@ public static PropellorSubsystem propellorSubsystem;
   public Command getAutonomousCommand() {
     CommandFactory factory = chooser.getSelected();
     Command command = factory.get();
-    logger.info ("Command Factory gave us a {}", command);
+    logger.info("Command Factory gave us a {}", command);
     return command;
   }
+
+  public static double readSpinJoystick() {
+    return driverJoystick.getRawAxis(0);
+  }
+
 }
